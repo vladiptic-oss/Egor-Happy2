@@ -7,30 +7,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Playfair+Display:ital,wght@0,400;1,400&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #050510; font-family: 'Montserrat', sans-serif; overflow: hidden; touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        /* Звездный фон */
         #global-stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6), transparent), radial-gradient(1.5px 1.5px at 30% 40%, rgba(255,255,255,0.4), transparent); background-size: 200px 200px; opacity: 0.5; animation: twinkle 4s infinite alternate; }
         @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+        
+        /* Плавающие эмодзи */
         .decorations-layer { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 3; overflow: hidden; }
         .bubble { position: absolute; bottom: -15%; opacity: 0; will-change: transform, opacity; transform: translate3d(0,0,0); animation-name: chaoticMove, flickerOpacity; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; font-size: 24px; }
         @keyframes chaoticMove { 0% { transform: translate3d(0, 0, 0) translateX(0) rotate(0deg); } 20% { transform: translate3d(0, -25vh, 0) translateX(30px) rotate(45deg); } 40% { transform: translate3d(0, -50vh, 0) translateX(-40px) rotate(90deg); } 60% { transform: translate3d(0, -75vh, 0) translateX(25px) rotate(135deg); } 80% { transform: translate3d(0, -100vh, 0) translateX(-15px) rotate(180deg); } 100% { transform: translate3d(0, -125vh, 0) translateX(0) rotate(270deg); } }
         @keyframes flickerOpacity { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        #intro-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle at center, rgba(26, 11, 46, 0.6) 0%, rgba(5, 5, 16, 0.8) 100%); z-index: 100; transition: 1.2s cubic-bezier(0.7, 0, 0.3, 1); transform-origin: center; overflow: hidden; }
-        #intro-screen.zoom-out { transform: scale(0) rotate(10deg); opacity: 0; }
-        .greeting-text { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 5vw, 2.2rem); color: #FFD700; text-align: center; font-weight: 700; z-index: 10; text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF3366; padding: 0 20px; animation: pulseText 2s infinite alternate; }
-        @keyframes pulseText { from { transform: scale(0.98); } to { transform: scale(1.02); } }
-        canvas#fireworks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+
+        /* МАГИЧЕСКАЯ ИНТРО-ЗАСТАВКА */
+        #intro-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #050510; z-index: 100; transition: opacity 1s ease; overflow: hidden; }
+        #intro-screen.hidden { opacity: 0; pointer-events: none; }
+        
+        /* Звезда магии */
+        .magic-star { width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 80px solid #FFD700; position: relative; transform: rotate(35deg); animation: pulseStar 2s infinite alternate, rotateStar 6s linear infinite; box-shadow: 0 0 40px #FFD700, 0 0 80px #FF8C00; opacity: 0; }
+        .magic-star::before { content: ''; position: absolute; top: 20px; left: -30px; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 80px solid #FFD700; transform: rotate(70deg); }
+        .magic-star::after { content: ''; position: absolute; top: 20px; left: -30px; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 80px solid #FFD700; transform: rotate(-70deg); }
+        
+        @keyframes pulseStar { 0% { transform: scale(0.8) rotate(35deg); opacity: 0.7; } 100% { transform: scale(1.2) rotate(35deg); opacity: 1; } }
+        @keyframes rotateStar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .intro-text { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 6vw, 2.5rem); color: #FFD700; text-align: center; opacity: 0; transform: scale(0.5); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); z-index: 10; text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF3366; padding: 0 20px; }
+        .intro-text.show { opacity: 1; transform: scale(1); }
+        
+        canvas#fireworks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; opacity: 0; transition: opacity 1s ease; }
+        canvas#fireworks.show { opacity: 1; }
+
+        /* Флэш при переходе */
         #portal-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #ffffff 0%, #FFD700 50%, transparent 100%); opacity: 0; pointer-events: none; z-index: 150; transition: opacity 0.4s ease; }
         #portal-flash.active { opacity: 1; }
+
+        /* ГАЛЕРЕЯ */
         #gallery-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 80; transition: background 0.8s ease; overflow: hidden; }
         .slide { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; padding: 20px; box-sizing: border-box; will-change: transform, opacity; }
         .slide img { max-width: 100%; max-height: 55vh; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); object-fit: contain; border: 2px solid rgba(255, 255, 255, 0.3); background-color: rgba(0, 0, 0, 0.4); pointer-events: none; content-visibility: auto; }
         .slide p { color: #fff; font-family: 'Montserrat', sans-serif; font-size: clamp(1rem, 3.5vw, 1.15rem); text-align: center; margin-top: 20px; line-height: 1.5; max-width: 90%; text-shadow: 0 2px 4px rgba(0,0,0,0.9); font-weight: 500; pointer-events: none; padding: 12px 20px; background: rgba(0, 0, 0, 0.7); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        
         #gallery-screen[data-anim="slide"] .slide { transform: translate3d(100%, 0, 0); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s; }
         #gallery-screen[data-anim="slide"] .slide.active { transform: translate3d(0, 0, 0); opacity: 1; pointer-events: auto; z-index: 2; }
         #gallery-screen[data-anim="slide"] .slide.prev { transform: translate3d(-100%, 0, 0); opacity: 0; z-index: 1; }
+
+        /* Таймер */
         .timer-box { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; padding: 20px; text-align: center; color: white; margin-top: 10px; width: 100%; max-width: 350px; cursor: pointer; transition: transform 0.1s; }
         .timer-box:active { transform: scale(0.98); }
         .timer-box h4 { margin: 0 0 10px 0; color: #00c6ff; font-size: 1.2rem; }
         .timer-box p { margin: 0; font-size: 1.3rem; font-weight: bold; color: #FFD700; }
+
+        /* КОНВЕРТ */
         #envelope-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; perspective: 1200px; }
         #envelope-overlay.show { display: flex; }
         .envelope { position: relative; width: min(320px, 85vw); height: min(220px, 58vw); background: #fdf5e6; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.1); transform: scale(0.8) rotate(-10deg); opacity: 0; transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); transform-style: preserve-3d; border: 1px solid #e0d0b8; }
@@ -40,27 +66,41 @@
         .envelope-stamp { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; background: radial-gradient(circle at 35% 35%, #ff5e5e, #b81d1d); border-radius: 50%; cursor: pointer; z-index: 10; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 0 5px rgba(0,0,0,0.2); border: 1px solid #8c1313; transition: transform 0.2s, opacity 0.3s; }
         .envelope-stamp:active { transform: translate(-50%, -50%) scale(0.9); }
         .envelope-stamp::after { content: 'Е'; color: #8c1313; font-family: 'Playfair Display', serif; font-weight: bold; font-size: 26px; text-shadow: 1px 1px 1px rgba(255,255,255,0.2), -1px -1px 1px rgba(0,0,0,0.4); }
+        
         .letter-paper { position: absolute; top: 10px; left: 50%; transform: translateX(-50%) translateY(0); width: 90%; height: 90%; background: #fffdf8; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding: 25px; box-sizing: border-box; opacity: 0; pointer-events: none; z-index: 1; transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s; display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto; border: 1px solid #eee; }
         #envelope-overlay.open .envelope-stamp { opacity: 0; pointer-events: none; }
         #envelope-overlay.open .letter-paper { transform: translateX(-50%) translateY(-80%) scale(1.1); height: 120%; opacity: 1; pointer-events: auto; z-index: 15; }
         .close-letter-btn { margin-top: 15px; padding: 10px; background: #a84f68; color: white; border: none; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; cursor: pointer; align-self: center; transition: transform 0.2s; }
         .close-letter-btn:active { transform: scale(0.95); }
+
+        /* Экран "Ничего не нажимай" */
         #wait-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 19000; display: none; justify-content: center; align-items: center; }
         #wait-screen.show { display: flex; }
         .wait-text { color: #fff; font-size: 1.5rem; font-family: 'Montserrat', sans-serif; text-align: center; opacity: 0; animation: fadeInOut 3s forwards; }
         @keyframes fadeInOut { 0% { opacity: 0; transform: scale(0.9); } 20% { opacity: 1; transform: scale(1); } 80% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.1); } }
+        
+        /* КОНФЕТТИ */
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30000; }
     </style>
 </head>
 <body>
+
     <div id="global-stars"></div>
     <div class="decorations-layer" id="decorations"></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- МАГИЧЕСКАЯ ИНТРО-ЗАСТАВКА -->
     <div id="intro-screen">
-        <div class="greeting-text">🎉 С ДНЕМ РОЖДЕНИЯ, ЕГОР!!! 🧠✊</div>
+        <div class="magic-star" id="magic-star"></div>
+        <div class="intro-text" id="intro-text">🎉 С ДНЕМ РОЖДЕНИЯ, ЕГОР!!! 🧠✊</div>
         <canvas id="fireworks"></canvas>
     </div>
+
     <div id="portal-flash"></div>
     <div id="gallery-screen" data-anim="slide"></div>
+
     <div id="wait-screen"><div class="wait-text">Ничего не нажимай...<br>Смотри 👀</div></div>
+
     <div id="envelope-overlay">
         <div class="envelope">
             <div class="envelope-text">открой, это тебе</div>
@@ -79,6 +119,7 @@
             <div class="envelope-stamp" onclick="openEnvelope()"></div>
         </div>
     </div>
+
     <script>
         const texts = [
             "Счастливый Егор и мама — любимые голубки. Пусть эти моменты останутся с вами навсегда 🕊️",
@@ -110,8 +151,10 @@
             "linear-gradient(135deg, rgba(25, 25, 112, 0.85), rgba(72, 61, 139, 0.85), rgba(0, 0, 0, 0.85))",
             "linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(30, 30, 30, 0.9), rgba(0, 0, 0, 0.9))"
         ];
+
         localStorage.removeItem('envelopeFinished');
         const birthDate = new Date('1983-11-21T00:00:00'); 
+        
         function updateTimer() {
             const now = new Date(); const diff = now - birthDate;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24)); const hours = Math.floor((diff / (1000 * 60 * 60)) % 24); const mins = Math.floor((diff / 1000 / 60) % 60); const secs = Math.floor((diff / 1000) % 60);
@@ -119,6 +162,7 @@
             if (timerEl) timerEl.innerText = `${days} дн. ${hours} ч. ${mins} мин. ${secs} сек.`;
         }
         setInterval(updateTimer, 1000);
+        
         let timerClicks = 0;
         window.handleTimerClick = function() {
             if (localStorage.getItem('envelopeFinished')) { alert("Ты уже видел этот секрет 😉"); return; }
@@ -129,11 +173,17 @@
                 setTimeout(() => { document.getElementById('wait-screen').classList.remove('show'); document.getElementById('envelope-overlay').classList.add('show'); }, 3000);
             }
         }
-        window.openEnvelope = function() { document.getElementById('envelope-overlay').classList.add('open'); }
+        
+        // ОТКРЫТИЕ КОНВЕРТА + КОНФЕТТИ
+        window.openEnvelope = function() { 
+            document.getElementById('envelope-overlay').classList.add('open'); 
+            startConfetti();
+        }
         window.closeEnvelope = function() {
             const overlay = document.getElementById('envelope-overlay'); overlay.classList.remove('open');
             setTimeout(() => { overlay.classList.remove('show'); localStorage.setItem('envelopeFinished', 'true'); }, 500);
         }
+
         function handleTilt(e) {
             const slide = document.querySelector('.slide.active'); if (!slide) return; const img = slide.querySelector('img'); const p = slide.querySelector('p'); if (!img) return;
             let xAxis, yAxis;
@@ -143,6 +193,7 @@
         }
         if (window.DeviceOrientationEvent) window.addEventListener('deviceorientation', handleTilt);
         document.addEventListener('mousemove', handleTilt);
+
         function createDecorations() {
             const container = document.getElementById('decorations'); const emojis = ['🧠', '✊', '💪', '🔥', '⭐', '🚀', '💫']; const totalElements = 25;
             for (let i = 0; i < totalElements; i++) {
@@ -153,10 +204,13 @@
             }
         }
         createDecorations();
+
+        // === САЛЮТ ===
         const canvas = document.getElementById('fireworks'); const ctx = canvas.getContext('2d');
         let particles = []; let rockets = [];
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        
         class Rocket {
             constructor(x, y, targetY, color) { this.x = x; this.y = y; this.targetY = targetY; this.color = color; this.vy = (targetY - y) / 60; this.life = 1; }
             update() { this.y += this.vy; if (this.y <= this.targetY) { this.life = 0; explode(this.x, this.y, this.color); } }
@@ -180,14 +234,91 @@
             requestAnimationFrame(animate);
         }
         animate();
+
+        // === КОНФЕТТИ ===
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        let confettiActive = false;
+        
+        function resizeConfetti() { confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeConfetti); resizeConfetti();
+
+        class Confetti {
+            constructor() {
+                this.x = Math.random() * confettiCanvas.width;
+                this.y = -10;
+                this.w = Math.random() * 8 + 5;
+                this.h = Math.random() * 6 + 4;
+                this.vx = (Math.random() - 0.5) * 3;
+                this.vy = Math.random() * 3 + 2;
+                this.angle = Math.random() * 360;
+                this.spin = (Math.random() - 0.5) * 10;
+                const colors = ['#FFD700', '#FF3366', '#1E90FF', '#32CD32', '#FFFFFF', '#FF8C00'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.life = 1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy; this.angle += this.spin;
+                if (this.y > confettiCanvas.height) this.life = 0;
+            }
+            draw() {
+                confettiCtx.save();
+                confettiCtx.translate(this.x, this.y);
+                confettiCtx.rotate(this.angle * Math.PI / 180);
+                confettiCtx.fillStyle = this.color;
+                confettiCtx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
+                confettiCtx.restore();
+            }
+        }
+
+        function startConfetti() {
+            if (confettiActive) return;
+            confettiActive = true;
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => { confettiParticles.push(new Confetti()); }, i * 20);
+            }
+        }
+
+        function animateConfetti() {
+            if (confettiActive) {
+                confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                for (let i = confettiParticles.length - 1; i >= 0; i--) {
+                    confettiParticles[i].update();
+                    confettiParticles[i].draw();
+                    if (confettiParticles[i].life <= 0) confettiParticles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(animateConfetti);
+        }
+        animateConfetti();
+
+        // === МАГИЧЕСКАЯ ИНТРО-АНИМАЦИЯ ===
         setTimeout(() => {
-            const intro = document.getElementById('intro-screen'); const flash = document.getElementById('portal-flash'); if(intro) intro.classList.add('zoom-out');
+            const star = document.getElementById('magic-star');
+            star.style.opacity = 1;
+            star.style.transition = 'opacity 1s ease';
+            
             setTimeout(() => {
-                if(flash) flash.classList.add('active');
-                setTimeout(() => { if(intro) intro.style.display = 'none'; initGallery(); if(flash) flash.classList.remove('active'); }, 400);
-            }, 600);
-        }, 8000); 
+                star.style.transform = 'scale(3) rotate(180deg)';
+                star.style.opacity = 0;
+                star.style.transition = 'all 0.5s ease-in';
+            }, 2000);
+
+            setTimeout(() => {
+                document.getElementById('intro-text').classList.add('show');
+                document.getElementById('fireworks').classList.add('show');
+            }, 2500);
+
+            setTimeout(() => {
+                document.getElementById('intro-screen').classList.add('hidden');
+                initGallery();
+            }, 7000);
+
+        }, 500);
+
         let currentSlide = 0; const galleryScreen = document.getElementById('gallery-screen'); let startX = 0, startY = 0, isDragging = false;
+        
         function initGallery() {
             galleryScreen.style.background = backgrounds[0];
             for (let i = 0; i < 13; i++) {
@@ -202,12 +333,14 @@
             }
             galleryScreen.style.display = 'flex'; setupSwipe(galleryScreen); setupKeyboard();
         }
+
         function setupKeyboard() {
             window.addEventListener('keydown', (e) => {
                 if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
                 if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(currentSlide + 1); else if (e.key === 'ArrowLeft') changeSlide(currentSlide - 1);
             });
         }
+
         function setupSwipe(element) {
             element.addEventListener('touchstart', e => {
                 if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL' || e.target.closest('.timer-box')) return;
@@ -221,6 +354,7 @@
                 if (diffX > 80) changeSlide(currentSlide - 1); else if (diffX < -80) changeSlide(currentSlide + 1);
             }, {passive: true});
         }
+
         function changeSlide(newIndex) {
             const slides = document.querySelectorAll('.slide');
             if (newIndex >= 0 && newIndex < slides.length) {
