@@ -28,8 +28,9 @@
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
             filter: drop-shadow(0 0 20px #FFD700) drop-shadow(0 0 40px #FF8C00);
             opacity: 0;
-            transform: scale(0.5) rotate(0deg);
-            transition: opacity 0.5s ease, transform 2s ease-out;
+            transform: scale(0.1) rotate(0deg);
+            /* Ускорил анимацию */
+            transition: opacity 0.5s ease, transform 1.5s ease-out;
         }
         
         #intro-text { 
@@ -94,6 +95,7 @@
     <div class="decorations-layer" id="decorations"></div>
     <canvas id="confetti-canvas"></canvas>
 
+    <!-- ИНТРО -->
     <div id="intro-screen">
         <div id="magic-star"></div>
         <div id="intro-text">🎉 С ДНЕМ РОЖДЕНИЯ, ЕГОР!!! 🧠✊</div>
@@ -104,6 +106,7 @@
 
     <div id="wait-screen"><div class="wait-text">Ничего не нажимай...<br>Смотри 👀</div></div>
 
+    <!-- КОНВЕРТ -->
     <div id="envelope-overlay">
         <div class="envelope">
             <div class="envelope-text">открой, это тебе</div>
@@ -294,7 +297,7 @@
         animateConfetti();
 
         // === ИСПРАВЛЕННАЯ ИНТРО-АНИМАЦИЯ (НА JS) ===
-        window.onload = function() {
+        document.addEventListener("DOMContentLoaded", function() {
             const star = document.getElementById('magic-star');
             const introText = document.getElementById('intro-text');
             const fireworksCanvas = document.getElementById('fireworks');
@@ -309,14 +312,12 @@
             // 2. Звезда пульсирует (через transform)
             setTimeout(() => {
                 star.style.transform = 'scale(1.5) rotate(360deg)';
-                star.style.transition = 'transform 1s ease-in-out';
             }, 1000);
 
             // 3. Взрыв звезды и появление текста
             setTimeout(() => {
                 star.style.transform = 'scale(10) rotate(720deg)';
                 star.style.opacity = '0';
-                star.style.transition = 'all 0.5s ease-in';
                 
                 introText.classList.add('show');
                 fireworksCanvas.classList.add('show');
@@ -327,7 +328,7 @@
                 introScreen.classList.add('hidden');
                 initGallery();
             }, 7000);
-        };
+        });
 
         let currentSlide = 0; const galleryScreen = document.getElementById('gallery-screen'); let startX = 0, startY = 0, isDragging = false;
         
