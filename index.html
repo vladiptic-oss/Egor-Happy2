@@ -8,39 +8,58 @@
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #050510; font-family: 'Montserrat', sans-serif; overflow: hidden; touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
         
-        /* Звездный фон */
         #global-stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6), transparent), radial-gradient(1.5px 1.5px at 30% 40%, rgba(255,255,255,0.4), transparent); background-size: 200px 200px; opacity: 0.5; animation: twinkle 4s infinite alternate; }
         @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
         
-        /* Плавающие эмодзи */
         .decorations-layer { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 3; overflow: hidden; }
         .bubble { position: absolute; bottom: -15%; opacity: 0; will-change: transform, opacity; transform: translate3d(0,0,0); animation-name: chaoticMove, flickerOpacity; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; font-size: 24px; }
         @keyframes chaoticMove { 0% { transform: translate3d(0, 0, 0) translateX(0) rotate(0deg); } 20% { transform: translate3d(0, -25vh, 0) translateX(30px) rotate(45deg); } 40% { transform: translate3d(0, -50vh, 0) translateX(-40px) rotate(90deg); } 60% { transform: translate3d(0, -75vh, 0) translateX(25px) rotate(135deg); } 80% { transform: translate3d(0, -100vh, 0) translateX(-15px) rotate(180deg); } 100% { transform: translate3d(0, -125vh, 0) translateX(0) rotate(270deg); } }
         @keyframes flickerOpacity { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* МАГИЧЕСКАЯ ИНТРО-ЗАСТАВКА */
+        /* ИСПРАВЛЕННАЯ МАГИЧЕСКАЯ ЗАСТАВКА */
         #intro-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #050510; z-index: 100; transition: opacity 1s ease; overflow: hidden; }
         #intro-screen.hidden { opacity: 0; pointer-events: none; }
         
-        /* Звезда магии */
-        .magic-star { width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 80px solid #FFD700; position: relative; transform: rotate(35deg); animation: pulseStar 2s infinite alternate, rotateStar 6s linear infinite; box-shadow: 0 0 40px #FFD700, 0 0 80px #FF8C00; opacity: 0; }
-        .magic-star::before { content: ''; position: absolute; top: 20px; left: -30px; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 80px solid #FFD700; transform: rotate(70deg); }
-        .magic-star::after { content: ''; position: absolute; top: 20px; left: -30px; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 80px solid #FFD700; transform: rotate(-70deg); }
+        .star-container {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: rotateStar 4s linear infinite;
+        }
+
+        /* Четырехлучевая звезда */
+        .star {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #FFD700;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: pulseStar 2s infinite alternate;
+            filter: drop-shadow(0 0 20px #FFD700) drop-shadow(0 0 40px #FF8C00);
+            transition: all 0.5s ease-in;
+        }
         
-        @keyframes pulseStar { 0% { transform: scale(0.8) rotate(35deg); opacity: 0.7; } 100% { transform: scale(1.2) rotate(35deg); opacity: 1; } }
-        @keyframes rotateStar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulseStar { 
+            0% { transform: scale(0.8); opacity: 0.7; } 
+            100% { transform: scale(1.2); opacity: 1; } 
+        }
+        @keyframes rotateStar { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
         
-        .intro-text { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 6vw, 2.5rem); color: #FFD700; text-align: center; opacity: 0; transform: scale(0.5); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); z-index: 10; text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF3366; padding: 0 20px; }
+        .intro-text { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 5vw, 2.2rem); color: #FFD700; text-align: center; opacity: 0; transform: scale(0.5); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); z-index: 10; text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF3366; padding: 0 20px; position: absolute; }
         .intro-text.show { opacity: 1; transform: scale(1); }
         
         canvas#fireworks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; opacity: 0; transition: opacity 1s ease; }
         canvas#fireworks.show { opacity: 1; }
 
-        /* Флэш при переходе */
         #portal-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #ffffff 0%, #FFD700 50%, transparent 100%); opacity: 0; pointer-events: none; z-index: 150; transition: opacity 0.4s ease; }
         #portal-flash.active { opacity: 1; }
 
-        /* ГАЛЕРЕЯ */
         #gallery-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 80; transition: background 0.8s ease; overflow: hidden; }
         .slide { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; padding: 20px; box-sizing: border-box; will-change: transform, opacity; }
         .slide img { max-width: 100%; max-height: 55vh; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); object-fit: contain; border: 2px solid rgba(255, 255, 255, 0.3); background-color: rgba(0, 0, 0, 0.4); pointer-events: none; content-visibility: auto; }
@@ -50,13 +69,11 @@
         #gallery-screen[data-anim="slide"] .slide.active { transform: translate3d(0, 0, 0); opacity: 1; pointer-events: auto; z-index: 2; }
         #gallery-screen[data-anim="slide"] .slide.prev { transform: translate3d(-100%, 0, 0); opacity: 0; z-index: 1; }
 
-        /* Таймер */
         .timer-box { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; padding: 20px; text-align: center; color: white; margin-top: 10px; width: 100%; max-width: 350px; cursor: pointer; transition: transform 0.1s; }
         .timer-box:active { transform: scale(0.98); }
         .timer-box h4 { margin: 0 0 10px 0; color: #00c6ff; font-size: 1.2rem; }
         .timer-box p { margin: 0; font-size: 1.3rem; font-weight: bold; color: #FFD700; }
 
-        /* КОНВЕРТ */
         #envelope-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; perspective: 1200px; }
         #envelope-overlay.show { display: flex; }
         .envelope { position: relative; width: min(320px, 85vw); height: min(220px, 58vw); background: #fdf5e6; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.1); transform: scale(0.8) rotate(-10deg); opacity: 0; transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); transform-style: preserve-3d; border: 1px solid #e0d0b8; }
@@ -73,13 +90,11 @@
         .close-letter-btn { margin-top: 15px; padding: 10px; background: #a84f68; color: white; border: none; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; cursor: pointer; align-self: center; transition: transform 0.2s; }
         .close-letter-btn:active { transform: scale(0.95); }
 
-        /* Экран "Ничего не нажимай" */
         #wait-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 19000; display: none; justify-content: center; align-items: center; }
         #wait-screen.show { display: flex; }
         .wait-text { color: #fff; font-size: 1.5rem; font-family: 'Montserrat', sans-serif; text-align: center; opacity: 0; animation: fadeInOut 3s forwards; }
         @keyframes fadeInOut { 0% { opacity: 0; transform: scale(0.9); } 20% { opacity: 1; transform: scale(1); } 80% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.1); } }
         
-        /* КОНФЕТТИ */
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30000; }
     </style>
 </head>
@@ -91,7 +106,9 @@
 
     <!-- МАГИЧЕСКАЯ ИНТРО-ЗАСТАВКА -->
     <div id="intro-screen">
-        <div class="magic-star" id="magic-star"></div>
+        <div class="star-container" id="star-container">
+            <div class="star" id="star-element"></div>
+        </div>
         <div class="intro-text" id="intro-text">🎉 С ДНЕМ РОЖДЕНИЯ, ЕГОР!!! 🧠✊</div>
         <canvas id="fireworks"></canvas>
     </div>
@@ -174,7 +191,6 @@
             }
         }
         
-        // ОТКРЫТИЕ КОНВЕРТА + КОНФЕТТИ
         window.openEnvelope = function() { 
             document.getElementById('envelope-overlay').classList.add('open'); 
             startConfetti();
@@ -205,7 +221,6 @@
         }
         createDecorations();
 
-        // === САЛЮТ ===
         const canvas = document.getElementById('fireworks'); const ctx = canvas.getContext('2d');
         let particles = []; let rockets = [];
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -235,7 +250,6 @@
         }
         animate();
 
-        // === КОНФЕТТИ ===
         const confettiCanvas = document.getElementById('confetti-canvas');
         const confettiCtx = confettiCanvas.getContext('2d');
         let confettiParticles = [];
@@ -293,29 +307,28 @@
         }
         animateConfetti();
 
-        // === МАГИЧЕСКАЯ ИНТРО-АНИМАЦИЯ ===
+        // === ИСПРАВЛЕННАЯ ИНТРО-АНИМАЦИЯ ===
         setTimeout(() => {
-            const star = document.getElementById('magic-star');
-            star.style.opacity = 1;
-            star.style.transition = 'opacity 1s ease';
-            
+            const starElement = document.getElementById('star-element');
+            // Звезда пульсирует 2 секунды
             setTimeout(() => {
-                star.style.transform = 'scale(3) rotate(180deg)';
-                star.style.opacity = 0;
-                star.style.transition = 'all 0.5s ease-in';
+                // Звезда взрывается (увеличивается и исчезает)
+                starElement.style.transform = 'scale(5)';
+                starElement.style.opacity = '0';
+                document.getElementById('star-container').style.opacity = '0';
+                
+                setTimeout(() => {
+                    document.getElementById('intro-text').classList.add('show');
+                    document.getElementById('fireworks').classList.add('show');
+                }, 300);
+
+                setTimeout(() => {
+                    document.getElementById('intro-screen').classList.add('hidden');
+                    initGallery();
+                }, 6000);
+
             }, 2000);
-
-            setTimeout(() => {
-                document.getElementById('intro-text').classList.add('show');
-                document.getElementById('fireworks').classList.add('show');
-            }, 2500);
-
-            setTimeout(() => {
-                document.getElementById('intro-screen').classList.add('hidden');
-                initGallery();
-            }, 7000);
-
-        }, 500);
+        }, 100);
 
         let currentSlide = 0; const galleryScreen = document.getElementById('gallery-screen'); let startX = 0, startY = 0, isDragging = false;
         
