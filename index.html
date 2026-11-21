@@ -16,49 +16,39 @@
         @keyframes chaoticMove { 0% { transform: translate3d(0, 0, 0) translateX(0) rotate(0deg); } 20% { transform: translate3d(0, -25vh, 0) translateX(30px) rotate(45deg); } 40% { transform: translate3d(0, -50vh, 0) translateX(-40px) rotate(90deg); } 60% { transform: translate3d(0, -75vh, 0) translateX(25px) rotate(135deg); } 80% { transform: translate3d(0, -100vh, 0) translateX(-15px) rotate(180deg); } 100% { transform: translate3d(0, -125vh, 0) translateX(0) rotate(270deg); } }
         @keyframes flickerOpacity { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* ИСПРАВЛЕННАЯ МАГИЧЕСКАЯ ЗАСТАВКА */
+        /* МАГИЧЕСКАЯ ЗАСТАВКА */
         #intro-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #050510; z-index: 100; transition: opacity 1s ease; overflow: hidden; }
         #intro-screen.hidden { opacity: 0; pointer-events: none; }
         
-        .star-container {
+        #magic-star {
             position: absolute;
-            width: 150px;
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: rotateStar 4s linear infinite;
-        }
-
-        /* Четырехлучевая звезда */
-        .star {
-            position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             background: #FFD700;
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            animation: pulseStar 2s infinite alternate;
             filter: drop-shadow(0 0 20px #FFD700) drop-shadow(0 0 40px #FF8C00);
-            transition: all 0.5s ease-in;
+            opacity: 0;
+            transform: scale(0.5) rotate(0deg);
+            transition: opacity 0.5s ease, transform 2s ease-out;
         }
         
-        @keyframes pulseStar { 
-            0% { transform: scale(0.8); opacity: 0.7; } 
-            100% { transform: scale(1.2); opacity: 1; } 
+        #intro-text { 
+            font-family: 'Playfair Display', serif; 
+            font-size: clamp(1.5rem, 5vw, 2.2rem); 
+            color: #FFD700; 
+            text-align: center; 
+            opacity: 0; 
+            transform: scale(0.5); 
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); 
+            z-index: 10; 
+            text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF3366; 
+            padding: 0 20px; 
+            position: absolute;
         }
-        @keyframes rotateStar { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        
-        .intro-text { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 5vw, 2.2rem); color: #FFD700; text-align: center; opacity: 0; transform: scale(0.5); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); z-index: 10; text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF3366; padding: 0 20px; position: absolute; }
-        .intro-text.show { opacity: 1; transform: scale(1); }
+        #intro-text.show { opacity: 1; transform: scale(1); }
         
         canvas#fireworks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; opacity: 0; transition: opacity 1s ease; }
         canvas#fireworks.show { opacity: 1; }
-
-        #portal-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #ffffff 0%, #FFD700 50%, transparent 100%); opacity: 0; pointer-events: none; z-index: 150; transition: opacity 0.4s ease; }
-        #portal-flash.active { opacity: 1; }
 
         #gallery-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 80; transition: background 0.8s ease; overflow: hidden; }
         .slide { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; padding: 20px; box-sizing: border-box; will-change: transform, opacity; }
@@ -104,16 +94,12 @@
     <div class="decorations-layer" id="decorations"></div>
     <canvas id="confetti-canvas"></canvas>
 
-    <!-- МАГИЧЕСКАЯ ИНТРО-ЗАСТАВКА -->
     <div id="intro-screen">
-        <div class="star-container" id="star-container">
-            <div class="star" id="star-element"></div>
-        </div>
-        <div class="intro-text" id="intro-text">🎉 С ДНЕМ РОЖДЕНИЯ, ЕГОР!!! 🧠✊</div>
+        <div id="magic-star"></div>
+        <div id="intro-text">🎉 С ДНЕМ РОЖДЕНИЯ, ЕГОР!!! 🧠✊</div>
         <canvas id="fireworks"></canvas>
     </div>
 
-    <div id="portal-flash"></div>
     <div id="gallery-screen" data-anim="slide"></div>
 
     <div id="wait-screen"><div class="wait-text">Ничего не нажимай...<br>Смотри 👀</div></div>
@@ -307,28 +293,41 @@
         }
         animateConfetti();
 
-        // === ИСПРАВЛЕННАЯ ИНТРО-АНИМАЦИЯ ===
-        setTimeout(() => {
-            const starElement = document.getElementById('star-element');
-            // Звезда пульсирует 2 секунды
+        // === ИСПРАВЛЕННАЯ ИНТРО-АНИМАЦИЯ (НА JS) ===
+        window.onload = function() {
+            const star = document.getElementById('magic-star');
+            const introText = document.getElementById('intro-text');
+            const fireworksCanvas = document.getElementById('fireworks');
+            const introScreen = document.getElementById('intro-screen');
+
+            // 1. Плавно показываем звезду
             setTimeout(() => {
-                // Звезда взрывается (увеличивается и исчезает)
-                starElement.style.transform = 'scale(5)';
-                starElement.style.opacity = '0';
-                document.getElementById('star-container').style.opacity = '0';
+                star.style.opacity = '1';
+                star.style.transform = 'scale(1) rotate(180deg)';
+            }, 100);
+
+            // 2. Звезда пульсирует (через transform)
+            setTimeout(() => {
+                star.style.transform = 'scale(1.5) rotate(360deg)';
+                star.style.transition = 'transform 1s ease-in-out';
+            }, 1000);
+
+            // 3. Взрыв звезды и появление текста
+            setTimeout(() => {
+                star.style.transform = 'scale(10) rotate(720deg)';
+                star.style.opacity = '0';
+                star.style.transition = 'all 0.5s ease-in';
                 
-                setTimeout(() => {
-                    document.getElementById('intro-text').classList.add('show');
-                    document.getElementById('fireworks').classList.add('show');
-                }, 300);
-
-                setTimeout(() => {
-                    document.getElementById('intro-screen').classList.add('hidden');
-                    initGallery();
-                }, 6000);
-
+                introText.classList.add('show');
+                fireworksCanvas.classList.add('show');
             }, 2000);
-        }, 100);
+
+            // 4. Убираем интро и запускаем галерею
+            setTimeout(() => {
+                introScreen.classList.add('hidden');
+                initGallery();
+            }, 7000);
+        };
 
         let currentSlide = 0; const galleryScreen = document.getElementById('gallery-screen'); let startX = 0, startY = 0, isDragging = false;
         
