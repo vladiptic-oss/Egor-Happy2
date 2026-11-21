@@ -16,21 +16,20 @@
         @keyframes chaoticMove { 0% { transform: translate3d(0, 0, 0) translateX(0) rotate(0deg); } 20% { transform: translate3d(0, -25vh, 0) translateX(30px) rotate(45deg); } 40% { transform: translate3d(0, -50vh, 0) translateX(-40px) rotate(90deg); } 60% { transform: translate3d(0, -75vh, 0) translateX(25px) rotate(135deg); } 80% { transform: translate3d(0, -100vh, 0) translateX(-15px) rotate(180deg); } 100% { transform: translate3d(0, -125vh, 0) translateX(0) rotate(270deg); } }
         @keyframes flickerOpacity { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* МАГИЧЕСКАЯ ЗАСТАВКА */
+        /* ИНТРО-ЗАСТАВКА (УПРОЩЕННАЯ МАГИЯ) */
         #intro-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #050510; z-index: 100; transition: opacity 1s ease; overflow: hidden; }
         #intro-screen.hidden { opacity: 0; pointer-events: none; }
         
-        #magic-star {
+        #magic-orb {
             position: absolute;
-            width: 100px;
-            height: 100px;
+            width: 20px;
+            height: 20px;
             background: #FFD700;
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            filter: drop-shadow(0 0 20px #FFD700) drop-shadow(0 0 40px #FF8C00);
+            border-radius: 50%;
+            box-shadow: 0 0 30px #FFD700, 0 0 60px #FF8C00, 0 0 100px #FF4500;
             opacity: 0;
-            transform: scale(0.1) rotate(0deg);
-            /* Ускорил анимацию */
-            transition: opacity 0.5s ease, transform 1.5s ease-out;
+            transform: scale(0.1);
+            transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
         
         #intro-text { 
@@ -97,7 +96,7 @@
 
     <!-- ИНТРО -->
     <div id="intro-screen">
-        <div id="magic-star"></div>
+        <div id="magic-orb"></div>
         <div id="intro-text">🎉 С ДНЕМ РОЖДЕНИЯ, ЕГОР!!! 🧠✊</div>
         <canvas id="fireworks"></canvas>
     </div>
@@ -296,34 +295,34 @@
         }
         animateConfetti();
 
-        // === ИСПРАВЛЕННАЯ ИНТРО-АНИМАЦИЯ (НА JS) ===
+        // === УПРОЩЕННАЯ ИНТРО-АНИМАЦИЯ (БЕЗ CLIP-PATH) ===
         document.addEventListener("DOMContentLoaded", function() {
-            const star = document.getElementById('magic-star');
+            const orb = document.getElementById('magic-orb');
             const introText = document.getElementById('intro-text');
             const fireworksCanvas = document.getElementById('fireworks');
             const introScreen = document.getElementById('intro-screen');
 
-            // 1. Плавно показываем звезду
+            // 1. Показываем свечение
             setTimeout(() => {
-                star.style.opacity = '1';
-                star.style.transform = 'scale(1) rotate(180deg)';
+                orb.style.opacity = '1';
+                orb.style.transform = 'scale(3)';
+                orb.style.boxShadow = '0 0 50px #FFD700, 0 0 100px #FF8C00';
             }, 100);
 
-            // 2. Звезда пульсирует (через transform)
+            // 2. Вспышка
             setTimeout(() => {
-                star.style.transform = 'scale(1.5) rotate(360deg)';
-            }, 1000);
+                orb.style.transform = 'scale(20)';
+                orb.style.opacity = '0';
+                orb.style.boxShadow = '0 0 150px #ffffff, 0 0 200px #FFD700';
+            }, 1500);
 
-            // 3. Взрыв звезды и появление текста
+            // 3. Текст и салют
             setTimeout(() => {
-                star.style.transform = 'scale(10) rotate(720deg)';
-                star.style.opacity = '0';
-                
                 introText.classList.add('show');
                 fireworksCanvas.classList.add('show');
-            }, 2000);
+            }, 1800);
 
-            // 4. Убираем интро и запускаем галерею
+            // 4. Запуск галереи
             setTimeout(() => {
                 introScreen.classList.add('hidden');
                 initGallery();
